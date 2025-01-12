@@ -6,7 +6,10 @@ import Home from './pages/Home'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
 import Navbar from './components/Navbar'
-import Evaluation from './pages/Evaluation' 
+import Consent from './pages/Consent' 
+import AddJob from './components/addJob'
+import Evaluation from './pages/Evaluation'
+import FaceRecognition from './pages/Face'
 function App() {
   const { user } = useAuthContext()
 
@@ -29,9 +32,15 @@ function App() {
               element={!user ? <Signup /> : <Navigate to="/" />} 
             />
             <Route 
+              path="/consent" 
+              element={user ? <Consent /> : <Navigate to="/login" />} 
+            />
+            <Route 
               path="/evaluation" 
               element={user ? <Evaluation /> : <Navigate to="/login" />} 
             />
+            <Route path="/add-job" element={<AddJob />} />
+            <Route path="/face" element={<FaceRecognition />} />
           </Routes>
         </div>
       </BrowserRouter>

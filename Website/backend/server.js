@@ -1,33 +1,104 @@
-require('dotenv').config()
+require('dotenv').config();
+const Job = require('./models/jobModel.js');   
+const Task = require('./models/taskModel'); 
 
-const express = require('express')
-const mongoose = require('mongoose')
-const workoutRoutes = require('./routes/workouts')
-const userRoutes = require('./routes/user')
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors'); 
+const multer = require('multer'); // Import multer
+const path = require('path');
+const fs = require('fs');
 
-// express app
-const app = express()
+const workoutRoutes = require('./routes/workouts');
+const userRoutes = require('./routes/user');
+const jobRoutes = require('./routes/jobs');
+const taskRoutes = require('./routes/task');
 
-// middleware
-app.use(express.json())
+// Express app
+const app = express();
+
+// Middleware
+app.use(cors({
+  origin: 'http://localhost:3000', // React's development server URL
+  methods: 'GET,POST,PUT,DELETE', // Allowed HTTP methods
+  allowedHeaders: 'Content-Type, Authorization', // Allowed headers
+}));
+
+app.use(express.json());
 
 app.use((req, res, next) => {
-  console.log(req.path, req.method)
-  next()
-})
+  console.log(req.path, req.method);
+  next();
+});
 
-// routes
-app.use('/api/workouts', workoutRoutes)
-app.use('/api/user', userRoutes)
+const uploadFolder = path.join(require('os').homedir(), 'Downloads'); 
+if (!fs.existsSync(uploadFolder)) {
+  fs.mkdirSync(uploadFolder); 
+}
 
-// connect to db
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadFolder); 
+  },
+  filename: (req, file, cb) => {
+    const uniqueName = `${Date.now()}-${file.originalname}`;
+    cb(null, uniqueName); 
+  },
+});
+
+const upload = multer({ storage });
+
+
+app.post('/api/jobs/:type/upload', upload.single('image'), async (req, res) => {
+  const { jobId } = req.body;
+  const { type } = req.params;
+
+  if (!jobId || !req.file) {
+    return res.status(400).json({ error: 'Job ID and image file are required.' });
+  }
+
+  const filePath = path.resolve(req.file.path);
+
+  try {
+    const job = await Job.findById(jobId);
+    if (!job) {
+      return res.status(404).json({ error: 'Job not found.' });
+    }
+
+    const task = await Task.findOne({ jobId, type });
+    if (!task) {
+      return res.status(404).json({ error: `${type} task not found for this job.` });
+    }
+
+    task.file = task.file || [];
+    task.file.push(filePath);
+
+    await task.save();
+
+    // Send a response indicating success
+    res.json({ success: true, taskId: task._id, filePath });
+
+  } catch (error) {
+    console.error('Error saving task:', error);
+    res.status(500).json({ error: 'Failed to save task details.' });
+  }
+});
+
+
+
+// Routes
+app.use('/api/workouts', workoutRoutes);
+app.use('/api/user', userRoutes);
+app.use("/api/jobs", jobRoutes);
+app.use("/api/task", taskRoutes);
+
+// Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
-    // listen for requests
     app.listen(process.env.PORT, () => {
-      console.log('connected to db & listening on port', process.env.PORT)
-    })
+      console.log('Connected to DB & listening on port', process.env.PORT);
+    });
   })
   .catch((error) => {
-    console.log(error)
-  })
+    console.log(error);
+  });
