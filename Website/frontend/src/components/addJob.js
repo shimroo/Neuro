@@ -52,7 +52,7 @@ const AddJob = () => {
   };
 
   const handleVoiceUpload = () => {
-    alert('Opening file upload dialog for voice!');
+    navigate('/audio', { state: { jobId, type: 'EMO-VOICE' } });
   };
 
   const handleHandwritingUpload = () => {
@@ -64,7 +64,7 @@ const AddJob = () => {
   };
 
   const handleTextUpload = () => {
-    alert('Upload text document!');
+    navigate('/text', { state: { jobId, type: 'EMO-TEXT' } });
   };
 
   return (

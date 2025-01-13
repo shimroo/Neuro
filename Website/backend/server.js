@@ -84,6 +84,71 @@ app.post('/api/jobs/:type/upload', upload.single('image'), async (req, res) => {
   }
 });
 
+app.post('/api/jobs/:type/uploadvoice', upload.single('audio'), async (req, res) => {
+  const { jobId } = req.body;
+  const { type } = req.params;
+
+  // Check if jobId and audio file are provided
+  if (!jobId || !req.file) {
+    return res.status(400).json({ error: 'Job ID and audio file are required.' });
+  }
+
+  const filePath = path.resolve(req.file.path);
+
+  try {
+    const job = await Job.findById(jobId);
+    if (!job) {
+      return res.status(404).json({ error: 'Job not found.' });
+    }
+
+    const task = await Task.findOne({ jobId, type });
+    if (!task) {
+      return res.status(404).json({ error: `${type} task not found for this job.` });
+    }
+
+    task.file = task.file || []; 
+    task.file.push(filePath);
+
+    await task.save();
+
+    res.json({ success: true, taskId: task._id, filePath });
+  } catch (error) {
+    console.error('Error saving task:', error);
+    res.status(500).json({ error: 'Failed to save task details.' });
+  }
+});
+
+app.post('/api/jobs/:type/uploadtext', async (req, res) => {
+  const { jobId, text } = req.body;
+  const { type } = req.params;
+
+  if (!jobId || !text) {
+    return res.status(400).json({ error: 'Job ID and text are required.' });
+  }
+
+  try {
+    const job = await Job.findById(jobId);
+    if (!job) {
+      return res.status(404).json({ error: 'Job not found.' });
+    }
+
+    const task = await Task.findOne({ jobId, type });
+    if (!task) {
+      return res.status(404).json({ error: `${type} task not found for this job.` });
+    }
+    console.log(text)
+    task.file = task.file || [];
+    task.file = [text];
+
+
+    await task.save();
+
+    res.json({ success: true, taskId: task._id });
+  } catch (error) {
+    console.error('Error saving task:', error);
+    res.status(500).json({ error: 'Failed to save task details.' });
+  }
+});
 
 
 // Routes

@@ -6,7 +6,7 @@ const FaceRecognition = ({  }) => {
   const [message, setMessage] = useState("");
   const [videoStream, setVideoStream] = useState(null);
   const location = useLocation();
-  const navigate = useNavigate(); // Hook for navigation
+  const navigate = useNavigate(); 
   const { jobId, type } = location.state || {};
 
   const handleCapture = () => {

@@ -10,6 +10,8 @@ import Consent from './pages/Consent'
 import AddJob from './components/addJob'
 import Evaluation from './pages/Evaluation'
 import FaceRecognition from './pages/Face'
+import Audio from './pages/Audio'
+import Text from './pages/Text'
 function App() {
   const { user } = useAuthContext()
 
@@ -41,6 +43,8 @@ function App() {
             />
             <Route path="/add-job" element={<AddJob />} />
             <Route path="/face" element={<FaceRecognition />} />
+            <Route path="/audio" element={<Audio />} />
+            <Route path="/text" element={<Text />} />
           </Routes>
         </div>
       </BrowserRouter>
