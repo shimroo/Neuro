@@ -40,7 +40,7 @@ const FaceRecognition = ({  }) => {
         setMessage(`Image uploaded successfully! File path: ${data.filePath}`);
         stopCamera();
         // onComplete(true);
-
+        
         navigate('/add-job', { state: { jobId, type } }); 
       } else {
         setMessage("Failed to save image.");

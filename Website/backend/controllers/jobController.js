@@ -45,7 +45,7 @@ const addJobController = async (req, res) => {
       type: taskType,
       version: 'v1',
       file: [],
-      output: ['Draft'],
+      output: 'DRAFT',
     }));
     const createdTasks = await Task.insertMany(tasks);
 

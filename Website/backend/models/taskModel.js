@@ -12,7 +12,7 @@ const taskSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: ['EMO-FACIAL', 'EMO-VOICE', 'EMO-WRITING', 'EMO-EEG','EMO-TEXT'],
+    enum: ['EMO-FACIAL', 'EMO-VOICE', 'EMO-WRITING', 'EMO-EEG', 'EMO-TEXT'],
     required: true,
   },
   version: {
@@ -20,10 +20,11 @@ const taskSchema = new mongoose.Schema({
     default: 'v1',
   },
   file: {
-    type: [String], 
+    type: [String],
   },
   output: {
-    type: [String],
+    type: String,
+    default: 'DRAFT', 
   },
 });
 

@@ -5,24 +5,41 @@ import { useNavigate, useLocation } from 'react-router-dom';
 
 const AddJob = () => {
   const [jobSelected, setJobSelected] = useState(false);
-  const [jobId, setJobId] = useState(null); 
+  const [jobId, setJobId] = useState(null);
   const [tasksCreated, setTasksCreated] = useState(false);
+  const [taskStatuses, setTaskStatuses] = useState({});
   const { user } = useAuthContext();
   const navigate = useNavigate();
-  const location = useLocation(); // Access location state
+  const location = useLocation();
 
-  // Check if the jobId and type are passed via navigation
   const { jobId: navJobId, type: navType } = location.state || {};
 
   useEffect(() => {
     if (navJobId && navType) {
       setJobId(navJobId);
       setJobSelected(true);
-      setTasksCreated(true);  
+      setTasksCreated(true);
+      fetchTaskStatuses(navJobId); // Fetch task statuses
     }
   }, [navJobId, navType]);
 
-  const handleJobSelection = async (event) => {
+  const fetchTaskStatuses = async (id) => {
+    try {
+      const response = await axios.get('http://localhost:4000/api/task/status', {
+        params: { jobId: id },
+      });
+      if (response.data.success) {
+        setTaskStatuses(response.data.data); // Store the task statuses
+      } else {
+        alert('Failed to fetch task statuses');
+      }
+    } catch (error) {
+      console.error('Error fetching task statuses:', error);
+      alert('Error fetching task statuses');
+    }
+  };
+
+  const handleJobSelection = (event) => {
     const selectedJob = event.target.value;
     if (selectedJob === 'EMOTION-DETECTION') {
       setJobSelected(true);
@@ -35,37 +52,39 @@ const AddJob = () => {
   const handleCreateJob = async () => {
     try {
       const response = await axios.post('http://localhost:4000/api/jobs/addjob', {
-        type: 'EMOTION-DETECTION', 
+        type: 'EMOTION-DETECTION',
         email: user.email,
       });
-      const newJobId = response.data.jobId; 
+      const newJobId = response.data.jobId;
       setJobId(newJobId);
-      setTasksCreated(true); // Create tasks once the job is created
+      setTasksCreated(true);
+      fetchTaskStatuses(newJobId); // Fetch task statuses for the new job
     } catch (error) {
-      console.error('Error creating job or tasks:', error);
-      alert('Failed to create job or tasks');
+      console.error('Error creating job:', error);
+      alert('Failed to create job');
     }
   };
 
-  const handleFaceUpload = () => {
-    navigate('/Face', { state: { jobId, type: 'EMO-FACIAL' } });
+  const handleTaskAction = (type) => {
+    const routes = {
+      'EMO-FACIAL': '/Face',
+      'EMO-VOICE': '/audio',
+      'EMO-TEXT': '/text',
+    };
+    if (routes[type]) {
+      navigate(routes[type], { state: { jobId, type } });
+    } else {
+      alert(`No action defined for ${type}`);
+    }
   };
 
-  const handleVoiceUpload = () => {
-    navigate('/audio', { state: { jobId, type: 'EMO-VOICE' } });
-  };
-
-  const handleHandwritingUpload = () => {
-    alert('Opening file upload dialog for handwriting!');
-  };
-
-  const handleEEGUpload = () => {
-    alert('Upload EEG data!');
-  };
-
-  const handleTextUpload = () => {
-    navigate('/text', { state: { jobId, type: 'EMO-TEXT' } });
-  };
+  const tasks = [
+    { label: 'Upload Face', type: 'EMO-FACIAL' },
+    { label: 'Upload MP3', type: 'EMO-VOICE' },
+    { label: 'Upload Handwriting', type: 'HANDWRITING' },
+    { label: 'Upload EEG', type: 'EEG' },
+    { label: 'Upload Text', type: 'EMO-TEXT' },
+  ];
 
   return (
     <div style={{ padding: '20px' }}>
@@ -81,7 +100,6 @@ const AddJob = () => {
           <option value="">Select Job</option>
           <option value="EMOTION-DETECTION">Emotion Detection</option>
         </select>
-
         {jobSelected && !navJobId && (
           <button
             onClick={handleCreateJob}
@@ -119,91 +137,38 @@ const AddJob = () => {
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td style={{ border: '1px solid #ddd', padding: '10px' }}>
-                  <button
-                    onClick={handleFaceUpload}
+              {tasks.map((task) => {
+                // Check task status using the task's type in taskStatuses
+                const isPending = taskStatuses[task.type] === 'PENDING';
+                return (
+                  <tr
+                    key={task.type}
                     style={{
-                      padding: '10px',
-                      border: '1px solid #ccc',
-                      backgroundColor: '#eee',
-                      cursor: 'pointer',
+                      backgroundColor: isPending ? '#f0f0f0' : 'white',
+                      color: isPending ? '#aaa' : 'black',
                     }}
                   >
-                    Upload Face
-                  </button>
-                </td>
-                <td style={{ border: '1px solid #ddd', padding: '10px' }}>LIE-FACIAL</td>
-                <td style={{ border: '1px solid #ddd', padding: '10px' }}>&lt;Pending&gt;</td>
-              </tr>
-              <tr>
-                <td style={{ border: '1px solid #ddd', padding: '10px' }}>
-                  <button
-                    onClick={handleVoiceUpload}
-                    style={{
-                      padding: '10px',
-                      border: '1px solid #ccc',
-                      backgroundColor: '#eee',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    Upload MP3
-                  </button>
-                </td>
-                <td style={{ border: '1px solid #ddd', padding: '10px' }}>LIE-VOICE</td>
-                <td style={{ border: '1px solid #ddd', padding: '10px' }}>&lt;Draft&gt;</td>
-              </tr>
-              <tr>
-                <td style={{ border: '1px solid #ddd', padding: '10px' }}>
-                  <button
-                    onClick={handleHandwritingUpload}
-                    style={{
-                      padding: '10px',
-                      border: '1px solid #ccc',
-                      backgroundColor: '#eee',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    Upload Handwriting
-                  </button>
-                </td>
-                <td style={{ border: '1px solid #ddd', padding: '10px' }}>HANDWRITING</td>
-                <td style={{ border: '1px solid #ddd', padding: '10px' }}>&lt;Pending&gt;</td>
-              </tr>
-              <tr>
-                <td style={{ border: '1px solid #ddd', padding: '10px' }}>
-                  <button
-                    onClick={handleEEGUpload}
-                    style={{
-                      padding: '10px',
-                      border: '1px solid #ccc',
-                      backgroundColor: '#eee',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    Upload EEG
-                  </button>
-                </td>
-                <td style={{ border: '1px solid #ddd', padding: '10px' }}>EEG</td>
-                <td style={{ border: '1px solid #ddd', padding: '10px' }}>&lt;Pending&gt;</td>
-              </tr>
-              <tr>
-                <td style={{ border: '1px solid #ddd', padding: '10px' }}>
-                  <button
-                    onClick={handleTextUpload}
-                    style={{
-                      padding: '10px',
-                      border: '1px solid #ccc',
-                      backgroundColor: '#eee',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    Upload Text
-                  </button>
-                </td>
-                <td style={{ border: '1px solid #ddd', padding: '10px' }}>TEXT</td>
-                <td style={{ border: '1px solid #ddd', padding: '10px' }}>&lt;Draft&gt;</td>
-              </tr>
+                    <td style={{ border: '1px solid #ddd', padding: '10px' }}>
+                      <button
+                        onClick={() => handleTaskAction(task.type)}
+                        style={{
+                          padding: '10px',
+                          border: '1px solid #ccc',
+                          backgroundColor: isPending ? '#eee' : '#fff',
+                          cursor: isPending ? 'not-allowed' : 'pointer',
+                        }}
+                        disabled={isPending}
+                      >
+                        {task.label}
+                      </button>
+                    </td>
+                    <td style={{ border: '1px solid #ddd', padding: '10px' }}>{task.type}</td>
+                    <td style={{ border: '1px solid #ddd', padding: '10px' }}>
+                      {taskStatuses[task.type] || '<Unknown>'}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
           <button

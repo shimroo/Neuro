@@ -72,7 +72,7 @@ app.post('/api/jobs/:type/upload', upload.single('image'), async (req, res) => {
 
     task.file = task.file || [];
     task.file.push(filePath);
-
+    task.output = "PENDING"
     await task.save();
 
     // Send a response indicating success
@@ -108,7 +108,7 @@ app.post('/api/jobs/:type/uploadvoice', upload.single('audio'), async (req, res)
 
     task.file = task.file || []; 
     task.file.push(filePath);
-
+    task.output = "PENDING"
     await task.save();
 
     res.json({ success: true, taskId: task._id, filePath });
@@ -139,7 +139,7 @@ app.post('/api/jobs/:type/uploadtext', async (req, res) => {
     console.log(text)
     task.file = task.file || [];
     task.file = [text];
-
+    task.output = "PENDING"
 
     await task.save();
 
