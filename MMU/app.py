@@ -77,3 +77,6 @@ if __name__ == "__main__":
         threads.append(thread)
 
     signal.pause()
+
+
+# logic to store response in the database
