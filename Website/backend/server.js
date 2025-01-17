@@ -14,6 +14,8 @@ const userRoutes = require('./routes/user');
 const jobRoutes = require('./routes/jobs');
 const taskRoutes = require('./routes/task');
 
+const { sendTaskToQueue } = require('./rabbitQueue');  
+
 // Express app
 const app = express();
 
@@ -49,6 +51,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 
+// Add the task to the RabbitMQ queue after saving the file
 app.post('/api/jobs/:type/upload', upload.single('image'), async (req, res) => {
   const { jobId } = req.body;
   const { type } = req.params;
@@ -72,17 +75,33 @@ app.post('/api/jobs/:type/upload', upload.single('image'), async (req, res) => {
 
     task.file = task.file || [];
     task.file.push(filePath);
-    task.output = "PENDING"
+    task.output = "PENDING";
     await task.save();
 
+    // Send task to RabbitMQ
+    let queueName;
+    if (type === 'EMO-FACIAL') {
+      queueName = 'facial_queue';
+    } else if (type === 'EMO-VOICE') {
+      queueName = 'audio_queue';
+    } else if (type === 'EMO-TEXT') {
+      queueName = 'writing_queue';
+    } else {
+      queueName = 'eeg_queue'; 
+    }
+
+    // Send the task to RabbitMQ
+    await sendTaskToQueue(queueName, jobId, { filePath });
+
     // Send a response indicating success
-    res.json({ success: true, taskId: task._id, filePath });
+    res.json({ success: true, taskId: jobId, filePath });
 
   } catch (error) {
     console.error('Error saving task:', error);
     res.status(500).json({ error: 'Failed to save task details.' });
   }
 });
+
 
 app.post('/api/jobs/:type/uploadvoice', upload.single('audio'), async (req, res) => {
   const { jobId } = req.body;
