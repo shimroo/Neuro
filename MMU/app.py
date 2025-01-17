@@ -17,8 +17,9 @@ def process_message(channel, method, properties, body, model_function):
     try:
         data = json.loads(body)
         print(f"Message: {data}")
+        jobId = data.get("jobId")
 
-        result = model_function(data["input_data"])
+        result = model_function(jobId ,data["input_data"])
         print(f"Result: {result}")
 
         channel.basic_ack(delivery_tag=method.delivery_tag)

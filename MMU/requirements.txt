@@ -5,3 +5,5 @@ torchaudio
 transformers
 scikit-learn
 opencv-python-headless
+pymongo
+bson

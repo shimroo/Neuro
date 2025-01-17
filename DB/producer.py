@@ -2,12 +2,9 @@ import pika
 import json
 import random
 
-
-# RabbitMQ connection
 connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
 channel = connection.channel()
 
-# Declare all the queues with the same durability as in app.py
 queues = ["facial_queue", "audio_queue", "eeg_queue", "writing_queue"]
 for queue in queues:
     channel.queue_declare(queue=queue, durable=True)
@@ -40,5 +37,4 @@ for i in range(20):
     else:
         send_task_to_queue("writing_queue", task_id, {"data": "writing_data"})
 
-# Close the connection
 connection.close()

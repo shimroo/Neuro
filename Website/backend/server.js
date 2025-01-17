@@ -91,7 +91,8 @@ app.post('/api/jobs/:type/upload', upload.single('image'), async (req, res) => {
     }
 
     // Send the task to RabbitMQ
-    await sendTaskToQueue(queueName, jobId, { filePath });
+    await sendTaskToQueue(queueName, jobId, { filePath, jobId });
+
 
     // Send a response indicating success
     res.json({ success: true, taskId: jobId, filePath });
