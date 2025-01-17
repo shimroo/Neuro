@@ -6,6 +6,7 @@ import sys
 from models import facial, audio, eeg, writing
 
 RABBITMQ_HOST = 'rabbitmq'
+# RABBITMQ_HOST = 'localhost'
 QUEUES = {
     "facial_queue": facial.process,
     "audio_queue": audio.process,

@@ -188,7 +188,7 @@ app.post('/api/jobs/:type/uploadtext', async (req, res) => {
     }
 
     // Send the task to RabbitMQ
-    await sendTaskToQueue( queueName, jobId, { filePath, jobId });
+    await sendTaskToQueue( queueName, jobId, { text, jobId });
     res.json({ success: true, taskId: task._id });
   } catch (error) {
     console.error('Error saving task:', error);

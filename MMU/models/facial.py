@@ -5,6 +5,7 @@
 from pymongo import MongoClient
 from bson import ObjectId
 import random
+import time
 
 # class FacialEmotionDetector:
 #     def __init__(self, model_path="facial_emotion_model.pth"):
@@ -33,6 +34,7 @@ def process(data):
 
     # label = facial_model.predict(input_data)
     label = random.choice(["happy", "sad", "angry", "neutral", "fear"])
+    time.sleep(7)
     input_data = data["input_data"]
     jobId = input_data["jobId"]
     print(jobId, input_data, label)

@@ -4,6 +4,7 @@
 from pymongo import MongoClient
 from bson import ObjectId
 import random
+import time
 
 # class AudioEmotionDetector:
 #     def __init__(self, model_path="audio_emotion_model"):
@@ -26,6 +27,7 @@ def process(data):
 
     # label = audio_model.predict(audio_path)
     label = random.choice(["happy", "sad", "angry", "neutral", "fear"])
+    time.sleep(4)
     input_data = data["input_data"]
     jobId = input_data["jobId"]
     print(jobId, input_data, label)

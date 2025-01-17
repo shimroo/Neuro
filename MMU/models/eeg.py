@@ -1,6 +1,7 @@
 import random
 from pymongo import MongoClient
 from bson import ObjectId
+import time
 # def process(input_data):
 #     # Placeholder logic for facial model
 #     return {"model": "eeg", "status": "processed", "input": input_data, "output": random.uniform(0.5, 0.95)}
@@ -30,6 +31,7 @@ from bson import ObjectId
 def process(data):
     # label = eeg_model.predict(np.array(input_data))
     label = random.choice(["happy", "sad", "angry", "neutral", "fear"])
+    time.sleep(5)
     input_data = data["input_data"]
     jobId = input_data["jobId"]
     print(jobId, input_data, label)
