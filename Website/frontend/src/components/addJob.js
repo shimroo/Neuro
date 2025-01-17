@@ -86,9 +86,15 @@ const AddJob = () => {
     { label: 'Upload Text', type: 'EMO-TEXT' },
   ];
 
+  // Function to go back to the home page
+  const handleBack = () => {
+    navigate('/');
+  };
+
   return (
     <div style={{ padding: '20px' }}>
       <h1>Add Job</h1>
+
       <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
         <label htmlFor="job-select" style={{ marginRight: '10px' }}>Job:</label>
         <select
@@ -138,7 +144,6 @@ const AddJob = () => {
             </thead>
             <tbody>
               {tasks.map((task) => {
-                // Check task status using the task's type in taskStatuses
                 const isPending = taskStatuses[task.type] === 'PENDING';
                 return (
                   <tr
@@ -172,6 +177,7 @@ const AddJob = () => {
             </tbody>
           </table>
           <button
+            onClick={handleBack} // Navigate back to the home page when clicked
             style={{
               padding: '10px 20px',
               fontSize: '16px',

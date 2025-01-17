@@ -22,19 +22,22 @@ import random
 
 # audio_model = AudioEmotionDetector()
 
-def process(audio_path):
+def process(data):
 
     # label = audio_model.predict(audio_path)
     label = random.choice(["happy", "sad", "angry", "neutral", "fear"])
+    input_data = data["input_data"]
+    jobId = input_data["jobId"]
+    print(jobId, input_data, label)
 
-    MONGO_URI = "mongodb+srv://jasirhkhan:V3exi6IsPoiU9pED@cluster0.gb3yy.mongodb.net/LOL?retryWrites=true&w=majority&appName=Cluster0"
+    MONGO_URI = "mongodb+srv://Rafay:n7VvFCnkaiya0wS@neuro.ypxy9.mongodb.net/?retryWrites=true&w=majority&appName=Nuero"
     client = MongoClient(MONGO_URI)
 
-    db = client["LOL"]  
-    task_collection = db["jobs"]  
+    db = client["test"] 
+    task_collection = db["tasks"]  
 
     filter_criteria = {
-        "_id": ObjectId("678986a36e5b6b098fe4c2b7"),  
+        "jobId" : ObjectId(jobId),
         "type": "EMO-VOICE"          
     }
 

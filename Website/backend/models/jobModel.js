@@ -21,14 +21,10 @@ const jobSchema = new mongoose.Schema(
       enum: ['EMOTION-DETECTION'],
       required: true,
     },
-    status: {
-      type: String,
-      enum: ['DRAFT', 'PENDING', 'COMPLETE'],
-      default: 'DRAFT',
-    },
     output: {
-      type: [String], 
-    },
+      type: String,
+      default: 'DRAFT', 
+    }
   },
   { timestamps: true }
 );

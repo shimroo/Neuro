@@ -28,4 +28,16 @@ const taskSchema = new mongoose.Schema({
   },
 });
 
+// taskSchema.post('save', async function (doc) {
+//   const jobId = doc.jobId;
+
+//   // Only update job output if all tasks are finalized (no DRAFT/PENDING)
+//   await checkAllTasksAndUpdateJob(jobId);
+// });
+
+// taskSchema.post('update', async function (doc) {
+//   // Check if all tasks are completed before updating the job output
+//   await checkAllTasksAndUpdateJob(doc.jobId);
+// });
+
 module.exports = mongoose.model('Task', taskSchema);

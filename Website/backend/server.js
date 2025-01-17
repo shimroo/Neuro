@@ -14,7 +14,7 @@ const userRoutes = require('./routes/user');
 const jobRoutes = require('./routes/jobs');
 const taskRoutes = require('./routes/task');
 
-const { sendTaskToQueue } = require('./rabbit');  
+// const { sendTaskToQueue } = require('./rabbit');  
 
 // Express app
 const app = express();
@@ -91,7 +91,7 @@ app.post('/api/jobs/:type/upload', upload.single('image'), async (req, res) => {
     }
 
     // Send the task to RabbitMQ
-    await sendTaskToQueue(queueName, jobId, { filePath, jobId });
+    // await sendTaskToQueue( queueName, jobId, { filePath, jobId });
 
 
     // Send a response indicating success
@@ -131,6 +131,19 @@ app.post('/api/jobs/:type/uploadvoice', upload.single('audio'), async (req, res)
     task.output = "PENDING"
     await task.save();
 
+    let queueName;
+    if (type === 'EMO-FACIAL') {
+      queueName = 'facial_queue';
+    } else if (type === 'EMO-VOICE') {
+      queueName = 'audio_queue';
+    } else if (type === 'EMO-TEXT') {
+      queueName = 'writing_queue';
+    } else {
+      queueName = 'eeg_queue'; 
+    }
+
+    // Send the task to RabbitMQ
+    // await sendTaskToQueue( queueName, jobId, { filePath, jobId });
     res.json({ success: true, taskId: task._id, filePath });
   } catch (error) {
     console.error('Error saving task:', error);
@@ -162,7 +175,20 @@ app.post('/api/jobs/:type/uploadtext', async (req, res) => {
     task.output = "PENDING"
 
     await task.save();
+    
+    let queueName;
+    if (type === 'EMO-FACIAL') {
+      queueName = 'facial_queue';
+    } else if (type === 'EMO-VOICE') {
+      queueName = 'audio_queue';
+    } else if (type === 'EMO-TEXT') {
+      queueName = 'writing_queue';
+    } else {
+      queueName = 'eeg_queue'; 
+    }
 
+    // Send the task to RabbitMQ
+    // await sendTaskToQueue( queueName, jobId, { filePath, jobId });
     res.json({ success: true, taskId: task._id });
   } catch (error) {
     console.error('Error saving task:', error);
