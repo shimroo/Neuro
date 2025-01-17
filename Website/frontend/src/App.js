@@ -13,6 +13,9 @@ import FaceRecognition from './pages/Face'
 import Audio from './pages/Audio'
 import Text from './pages/Text'
 import JobDetails from './components/jobdetails';
+import EEGUpload from './pages/Eeg';
+import HandwritingUpload from './pages/Handwriting';
+
 function App() {
   const { user } = useAuthContext()
 
@@ -46,6 +49,8 @@ function App() {
             <Route path="/face" element={<FaceRecognition />} />
             <Route path="/audio" element={<Audio />} />
             <Route path="/text" element={<Text />} />
+            <Route path="/eeg" element={<EEGUpload />} />
+            <Route path="/handwriting" element={<HandwritingUpload />} />
             <Route path="/job/:id" element={<JobDetails />} />
 
           </Routes>

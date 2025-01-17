@@ -14,7 +14,7 @@ const userRoutes = require('./routes/user');
 const jobRoutes = require('./routes/jobs');
 const taskRoutes = require('./routes/task');
 
-// const { sendTaskToQueue } = require('./rabbit');  
+const { sendTaskToQueue } = require('./rabbit');  
 
 // Express app
 const app = express();
@@ -91,7 +91,7 @@ app.post('/api/jobs/:type/upload', upload.single('image'), async (req, res) => {
     }
 
     // Send the task to RabbitMQ
-    // await sendTaskToQueue( queueName, jobId, { filePath, jobId });
+    await sendTaskToQueue( queueName, jobId, { filePath, jobId });
 
 
     // Send a response indicating success
@@ -143,7 +143,7 @@ app.post('/api/jobs/:type/uploadvoice', upload.single('audio'), async (req, res)
     }
 
     // Send the task to RabbitMQ
-    // await sendTaskToQueue( queueName, jobId, { filePath, jobId });
+    await sendTaskToQueue( queueName, jobId, { filePath, jobId });
     res.json({ success: true, taskId: task._id, filePath });
   } catch (error) {
     console.error('Error saving task:', error);
@@ -175,7 +175,7 @@ app.post('/api/jobs/:type/uploadtext', async (req, res) => {
     task.output = "PENDING"
 
     await task.save();
-    
+
     let queueName;
     if (type === 'EMO-FACIAL') {
       queueName = 'facial_queue';
@@ -188,7 +188,7 @@ app.post('/api/jobs/:type/uploadtext', async (req, res) => {
     }
 
     // Send the task to RabbitMQ
-    // await sendTaskToQueue( queueName, jobId, { filePath, jobId });
+    await sendTaskToQueue( queueName, jobId, { filePath, jobId });
     res.json({ success: true, taskId: task._id });
   } catch (error) {
     console.error('Error saving task:', error);
@@ -196,6 +196,94 @@ app.post('/api/jobs/:type/uploadtext', async (req, res) => {
   }
 });
 
+app.post('/api/jobs/:type/uploadwriting', upload.single('file'), async (req, res) => {
+  const { jobId } = req.body;
+  const { type } = req.params;
+
+  // Check if jobId and audio file are provided
+  if (!jobId || !req.file) {
+    return res.status(400).json({ error: 'Job ID and audio file are required.' });
+  }
+
+  const filePath = path.resolve(req.file.path);
+
+  try {
+    const job = await Job.findById(jobId);
+    if (!job) {
+      return res.status(404).json({ error: 'Job not found.' });
+    }
+    const task = await Task.findOne({ jobId, type });
+    if (!task) {
+      return res.status(404).json({ error: `${type} task not found for this job.` });
+    }
+    task.file = task.file || []; 
+    task.file.push(filePath);
+    task.output = "PENDING"
+    await task.save();
+
+    let queueName;
+    if (type === 'EMO-FACIAL') {
+      queueName = 'facial_queue';
+    } else if (type === 'EMO-VOICE') {
+      queueName = 'audio_queue';
+    } else if (type === 'EMO-TEXT') {
+      queueName = 'writing_queue';
+    } else {
+      queueName = 'eeg_queue'; 
+    }
+
+    // Send the task to RabbitMQ
+    await sendTaskToQueue( queueName, jobId, { filePath, jobId });
+    res.json({ success: true, taskId: task._id, filePath });
+  } catch (error) {
+    console.error('Error saving task:', error);
+    res.status(500).json({ error: 'Failed to save task details.' });
+  }
+});
+
+app.post('/api/jobs/:type/uploadeeg', upload.single('file'), async (req, res) => {
+  const { jobId } = req.body;
+  const { type } = req.params;
+
+  if (!jobId || !req.file) {
+    return res.status(400).json({ error: 'Job ID and audio file are required.' });
+  }
+
+  const filePath = path.resolve(req.file.path);
+
+  try {
+    const job = await Job.findById(jobId);
+    if (!job) {
+      return res.status(404).json({ error: 'Job not found.' });
+    }
+    const task = await Task.findOne({ jobId, type });
+    if (!task) {
+      return res.status(404).json({ error: `${type} task not found for this job.` });
+    }
+    task.file = task.file || []; 
+    task.file.push(filePath);
+    task.output = "PENDING"
+    await task.save();
+
+    let queueName;
+    if (type === 'EMO-FACIAL') {
+      queueName = 'facial_queue';
+    } else if (type === 'EMO-VOICE') {
+      queueName = 'audio_queue';
+    } else if (type === 'EMO-TEXT') {
+      queueName = 'writing_queue';
+    } else {
+      queueName = 'eeg_queue'; 
+    }
+
+    // Send the task to RabbitMQ
+    await sendTaskToQueue( queueName, jobId, { filePath, jobId });
+    res.json({ success: true, taskId: task._id, filePath });
+  } catch (error) {
+    console.error('Error saving task:', error);
+    res.status(500).json({ error: 'Failed to save task details.' });
+  }
+});
 
 // Routes
 app.use('/api/workouts', workoutRoutes);
@@ -203,7 +291,6 @@ app.use('/api/user', userRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/task", taskRoutes);
 
-// Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     app.listen(process.env.PORT, () => {

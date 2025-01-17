@@ -70,6 +70,8 @@ const AddJob = () => {
       'EMO-FACIAL': '/Face',
       'EMO-VOICE': '/audio',
       'EMO-TEXT': '/text',
+      'EMO-WRITING': '/handwriting',
+      'EMO-EEG': '/eeg',
     };
     if (routes[type]) {
       navigate(routes[type], { state: { jobId, type } });
@@ -81,8 +83,8 @@ const AddJob = () => {
   const tasks = [
     { label: 'Upload Face', type: 'EMO-FACIAL' },
     { label: 'Upload MP3', type: 'EMO-VOICE' },
-    { label: 'Upload Handwriting', type: 'HANDWRITING' },
-    { label: 'Upload EEG', type: 'EEG' },
+    { label: 'Upload Handwriting', type: 'EMO-WRITING' },
+    { label: 'Upload EEG', type: 'EMO-EEG' },
     { label: 'Upload Text', type: 'EMO-TEXT' },
   ];
 

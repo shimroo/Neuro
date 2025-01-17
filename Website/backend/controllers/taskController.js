@@ -53,7 +53,6 @@ const getTaskStatus = async (req, res) => {
       dict[task.type] = task.output;
       return dict;
     }, {});
-
     res.status(200).json({
       success: true,
       data: taskStatusDict,
