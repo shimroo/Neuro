@@ -5,7 +5,7 @@ def process(input_data):
     return {"model": "eeg", "status": "processed", "input": input_data, "output": random.uniform(0.5, 0.95)}
 
 # import numpy as np
-# from sklearn.externals import joblib
+# import joblib
 
 # class EEGEmotionDetector:
 #     def __init__(self, model_path="eeg_emotion_model.pkl"):

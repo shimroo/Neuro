@@ -4,10 +4,10 @@ def process(input_data):
     # Placeholder logic for facial model
     return {"model": "writing", "status": "processed", "input": input_data, "output": random.uniform(0.5, 0.95)}
 
-# from sklearn.externals import joblib
+# import joblib
 
 # class WritingEmotionDetector:
-#     def __init__(self, model_path="writing_emotion_model.pkl"):
+#     def __init__(self, model_path="app/models/writing_emotion_model.pkl"):
 #         self.model = joblib.load(model_path)
 #         self.labels = ["happy", "sad", "angry", "neutral", "fear"]
 

@@ -1,9 +1,2 @@
 pika
-torch
-torchvision
-torchaudio
-transformers
-scikit-learn
-opencv-python-headless
 pymongo
-bson

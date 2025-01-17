@@ -14,7 +14,7 @@ const userRoutes = require('./routes/user');
 const jobRoutes = require('./routes/jobs');
 const taskRoutes = require('./routes/task');
 
-const { sendTaskToQueue } = require('./rabbitQueue');  
+const { sendTaskToQueue } = require('./rabbit');  
 
 // Express app
 const app = express();
